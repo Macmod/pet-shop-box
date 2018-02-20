@@ -18,19 +18,50 @@
     <![endif]-->
   </head>
   <body>
+    <div id="wrongNetwork" style="display: none;">
+      <div class="alert alert-danger" role="alert">
+        <strong>Wrong network!</strong> Please switch to the <span id="requiredNetwork">(...)</span> network on MetaMask.
+      </div>
+    </div>
+    <div id="wrongNetwork" style="display: none;">
+      <div class="alert alert-danger" role="alert">
+        <strong>No wallet!</strong> Please install a <a href="https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?hl=en">MetaMask</a> wallet to proceed.
+      </div>
+    </div>
     <div class="container">
       <div class="row">
         <div class="col-xs-12 col-sm-8 col-sm-push-2 text-center">
-          <h1>Pet Shop</h1>
-          <hr/>
-          <br/>
-          <button class="btn btn-default btn-addPet text-center" data-toggle="modal" data-target="#addPetModal" type="button" data-id="0">Add pet</button>
+          <h1>Pet Shop <span class="badge badge-pill badge-primary onlyOwner">Owner</span></h1>
         </div>
       </div>
-
-      <h3 id="add-one" class="text-center">There's no pets in your PetShop. Why don't you <a data-toggle="modal" data-target="#addPetModal"> add one</a>?</h3>
+      <hr/>
+      <h3 id="noPets" class="text-center">There's no pets in your PetShop.</h3>
+      <button class="btn btn-default btn-addPet text-center" data-toggle="modal" data-target="#addPetModal" type="button" data-id="0">Add pet</button>
       <div id="petsRow" style="padding-top: 20px" class="row">
         <!-- PETS LOAD HERE -->
+      </div>
+
+      <div id="adoptionLog">
+        <div class="row">
+          <div class="col-xs-12 col-sm-8 col-sm-push-2 text-center">
+            <h1>Adoption Log</h1>
+            <hr/>
+            <br/>
+          </div>
+          <table id="adoptionLogTable" class="table">
+            <thead>
+              <tr>
+                <th>Id</th>
+                <th>Pet</th>
+                <th>Adopter</th>
+                <th>Donation</th>
+                <th>Event</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -43,7 +74,21 @@
           <div class="panel-body">
             <img alt="140x140" data-src="holder.js/140x140" class="img-rounded img-center" style="width: 100%;" src="https://animalso.com/wp-content/uploads/2017/01/Golden-Retriever_6.jpg" data-holder-rendered="true">
             <br/><br/>
-            <button class="btn btn-default btn-adopt" type="button" data-id="0">Adopt</button>
+            <div class="input-group">
+              <input type="number" class="form-control donation" placeholder="Donation" step="0.0001" min="0" value="0.0001">
+              <div class="input-group-btn">
+                <button class="btn btn-default btn-adopt" type="button" data-id="0">Adopt</button>
+              </div>
+            </div>
+            <div class="input-group">
+              <br/>
+              <div class="petApproval" style="display: none;">
+                <div class="onlyOwner" style="display: none;">
+                  <button class="btn btn-success btn-approve-pet" type="button" data-id="0">Approve</button>
+                  <button class="btn btn-danger btn-reject-pet" type="button" data-id="0">Reject</button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
