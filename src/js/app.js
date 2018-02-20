@@ -13,10 +13,11 @@ App = {
     initWeb3: function() {
         // Is there an injected web3 instance?
         if (typeof web3 !== 'undefined') {
-            App.web3Provider = web3.currentProvider;
             $("#noWeb3").hide();
 
+            App.web3Provider = web3.currentProvider;
             App.web3 = new Web3(App.web3Provider);
+
             App.checkNetwork(App.network);
             App.initContract();
         } else {
@@ -28,7 +29,6 @@ App = {
               '8': 'Ubiq', '42': 'Kovan', '77': 'Sokol', '99': 'Core', '7762959': 'Musicoin'},
     checkNetwork: function(requiredNetId) {
         web3.version.getNetwork((err, netId) => {
-            console.log(netId);
             if (netId != requiredNetId) {
                 let netName;
                 if (requiredNetId in App.netsMap) {
@@ -46,7 +46,7 @@ App = {
     },
 
     initContract: function() {
-        $.getJSON('Adoption.json', function(data) {
+        $.getJSON('Adoption.json', (data) => {
             // Get the necessary contract artifact file and instantiate it with truffle-contract
             let AdoptionArtifact = data;
             App.contracts.Adoption = TruffleContract(AdoptionArtifact);
@@ -70,7 +70,6 @@ App = {
     },
 
     bindEvents: function() {
-        console.log('bindEvents');
         $(document).on('click', '#add-pet', App.addPet);
         $(document).on('click', '.btn-adopt', App.adopt);
         $(document).on('click', '.btn-approve-pet', (event) => App.concreteAdoption(event, true));
@@ -78,21 +77,21 @@ App = {
     },
 
     checkOwner: function() {
-        App.web3.eth.getAccounts(function(error, accounts) {
+        App.web3.eth.getAccounts((error, accounts) => {
             if (error) {
                 console.log(error);
             }
 
             let account = accounts[0];
-            App.contracts.Adoption.deployed().then(function(instance) {
+            App.contracts.Adoption.deployed().then((instance) => {
                 return instance.owner();
-            }).then(function(owner) {
+            }).then((owner) => {
                 if (owner == account) {
                     $(".onlyOwner").show();
                 } else {
                     $(".onlyOwner").hide();
                 }
-            }).catch(function(err) {
+            }).catch((err) => {
                 console.log(err.message);
             });
         });
@@ -101,11 +100,10 @@ App = {
     watchAdopted: function() {
         let stateLabels = {1: ['info', 'Requested'], 2: ['success', 'Adopted'], 3: ['alert', 'Rejected']};
 
-        App.contracts.Adoption.deployed().then(function(instance) {
+        App.contracts.Adoption.deployed().then((instance) => {
             let UpdatedPetStateEvent = instance.UpdatedPetState({}, {fromBlock: 0, toBlock: 'latest'});
-            UpdatedPetStateEvent.watch(function(err, result){
+            UpdatedPetStateEvent.watch((err, result) => {
                 args = result.args;
-                console.log('Event[UpdatedPetState]', args);
 
                 id = args.id;
                 adopter = args.adopter;
@@ -124,12 +122,10 @@ App = {
     },
 
     watchAdded: function() {
-        App.contracts.Adoption.deployed().then(function(instance) {
+        App.contracts.Adoption.deployed().then((instance) => {
             let AddedPetEvent = instance.AddedPet({}, {fromBlock: 0, toBlock: 'latest'});
-            AddedPetEvent.watch(function(error, result){
+            AddedPetEvent.watch((error, result) => {
                 args = result.args;
-                console.log('Event[AddedPet]', args);
-
                 App.loadPets();
             });
         });
@@ -137,21 +133,19 @@ App = {
 
     concreteAdoption: function(event, approved) {
         event.preventDefault();
-        console.log('concreteAdoption', approved);
 
         let petId = parseInt($(event.target).data('id'));
-        App.contracts.Adoption.deployed().then(function(instance) {
+        App.contracts.Adoption.deployed().then((instance) => {
             return instance.concreteAdoption(petId, approved);
         })
     },
 
     loadPets: function() {
-        console.log('loadPets');
         let adoptionInstance;
-        App.contracts.Adoption.deployed().then(function(instance) {
+        App.contracts.Adoption.deployed().then((instance) => {
             adoptionInstance = instance;
             return adoptionInstance.getNumberOfPets.call();
-        }).then(function(res) {
+        }).then((res) => {
             let numberOfPets = res.toNumber(); // number of pets is a BigNumber
 
             if (numberOfPets > 0) {
@@ -164,7 +158,7 @@ App = {
                     promises.push(adoptionInstance.getPet.call(i))
                 }
 
-                Promise.all(promises).then(function(result) {
+                Promise.all(promises).then((result) => {
                     let petsRow = $('#petsRow');
                     let petTemplate = $('#petTemplate');
                     petsRow.empty();
@@ -178,7 +172,6 @@ App = {
                         petTemplate.find('.donation').attr('data-id', i);
 
                         let state = result[i][2].toNumber();
-                        console.log(state);
                         if (state == 1) {
                             petTemplate.find('.btn-adopt').text('Pending').attr('disabled', true);
                             petTemplate.find('.petApproval').show();
@@ -196,7 +189,7 @@ App = {
             } else {
                 $("#noPets").show();
             }
-        }).catch(function(err) {
+        }).catch((err) => {
             console.log(err.message);
         });
     },
@@ -206,20 +199,20 @@ App = {
         let petName = $('#petName').val();
 
         let adoptionInstance;
-        App.web3.eth.getAccounts(function(error, accounts) {
+        App.web3.eth.getAccounts((error, accounts) => {
             if (error) {
                 console.log(error);
             }
 
             let account = accounts[0];
 
-            App.contracts.Adoption.deployed().then(function(instance) {
+            App.contracts.Adoption.deployed().then((instance) => {
                 adoptionInstance = instance;
 
                 return adoptionInstance.addPet(petName, { from: account });
-            }).then(function(result) {
+            }).then((result) => {
                 $('#addPetModal').modal('hide');
-            }).catch(function(err) {
+            }).catch((err) => {
                 console.log(err.message);
             });
         });
@@ -231,18 +224,17 @@ App = {
         let petId = parseInt($(event.target).data('id'));
         let donation = parseFloat($(".donation[data-id='" + petId + "']").val())
 
-        App.web3.eth.getAccounts(function(error, accounts) {
+        App.web3.eth.getAccounts((error, accounts) => {
             if (error) {
                 console.log(error);
             }
 
             let account = accounts[0];
 
-            App.contracts.Adoption.deployed().then(function(instance) {
+            App.contracts.Adoption.deployed().then((instance) => {
                 adoptionInstance = instance;
-
                 return adoptionInstance.adopt(petId, {from: account, value: web3.toWei(donation)});
-            }).catch(function(err) {
+            }).catch((err) => {
                 console.log(err.message);
             });
         });
