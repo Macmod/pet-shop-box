@@ -8,6 +8,7 @@ App = {
         "images/boxer.jpeg",
         "images/golden-retriever.jpeg"
     ],
+    network: "4447",
 
     initWeb3: function() {
         // Is there an injected web3 instance?
@@ -19,7 +20,7 @@ App = {
         }
 
         App.web3 = new Web3(App.web3Provider);
-        App.checkNetwork("4447");
+        App.checkNetwork(App.network);
         App.initContract();
     },
 
