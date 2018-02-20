@@ -15,13 +15,13 @@ App = {
         if (typeof web3 !== 'undefined') {
             App.web3Provider = web3.currentProvider;
             $("#noWeb3").hide();
+
+            App.web3 = new Web3(App.web3Provider);
+            App.checkNetwork(App.network);
+            App.initContract();
         } else {
             $("#noWeb3").show();
         }
-
-        App.web3 = new Web3(App.web3Provider);
-        App.checkNetwork(App.network);
-        App.initContract();
     },
 
     netsMap: {'0': 'Olympic', '1': 'Frontier', '2': 'Morden', '3': 'Ropsten', '4': 'Rinkeby',
